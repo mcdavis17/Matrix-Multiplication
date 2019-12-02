@@ -1,0 +1,1685 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 24 24 571 818
+%%Title: Enscript Output
+%%For: Caleb Davis
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Mon Nov 18 12:43:57 2019
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: A4 595 842 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 10 10 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [595 842] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 794 def
+/d_page_h 547 def
+/d_header_x 0 def
+/d_header_y 511 def
+/d_header_w 794 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 794 def
+/d_footer_h 0 def
+/d_output_w 794 def
+/d_output_h 511 def
+/cols 1 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 1 def
+/fname (package.c) def
+/fdir (.) def
+/ftail (package.c) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (11/17/19) def
+/modtimestr (23:54:43) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+30 498 M (1:) s
+48 498 M
+(//) s
+30 487 M (2:) s
+48 487 M
+(//  package.c) s
+30 476 M (3:) s
+48 476 M
+(//) s
+30 465 M (4:) s
+48 465 M
+(//) s
+30 454 M (5:) s
+48 454 M
+(//  Created by Caleb Davis on 11/11/19.) s
+30 443 M (6:) s
+48 443 M
+(//) s
+30 432 M (7:) s
+30 421 M (8:) s
+/Courier-Oblique 10 10 SUF
+48 421 M
+(#include <stdio.h>) s
+/F-gs-font 10 10 SF
+30 410 M (9:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+/Courier-Oblique 10 10 SUF
+48 410 M
+(#include <pthread.h>) s
+/F-gs-font 10 10 SF
+24 399 M (10:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+/Courier-Oblique 10 10 SUF
+48 399 M
+(#include <stdlib.h>) s
+/F-gs-font 10 10 SF
+24 388 M (11:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+/Courier-Oblique 10 10 SUF
+48 388 M
+(#include <ctype.h>) s
+/F-gs-font 10 10 SF
+24 377 M (12:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+/Courier-Oblique 10 10 SUF
+48 377 M
+(#include <string.h>) s
+/F-gs-font 10 10 SF
+24 366 M (13:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+/Courier-Oblique 10 10 SUF
+48 366 M
+(#include <sys/ipc.h>) s
+/F-gs-font 10 10 SF
+24 355 M (14:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+/Courier-Oblique 10 10 SUF
+48 355 M
+(#include <signal.h>) s
+/F-gs-font 10 10 SF
+24 344 M (15:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+/Courier-Oblique 10 10 SUF
+48 344 M
+(#include <sys/errno.h>) s
+/F-gs-font 10 10 SF
+24 333 M (16:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+/Courier-Oblique 10 10 SUF
+48 333 M
+(#include <sys/types.h>) s
+/F-gs-font 10 10 SF
+24 322 M (17:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+/Courier-Oblique 10 10 SUF
+48 322 M
+(#include <sys/msg.h>) s
+/F-gs-font 10 10 SF
+24 311 M (18:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+/Courier-Oblique 10 10 SUF
+48 311 M
+(#include <assert.h>) s
+/F-gs-font 10 10 SF
+24 300 M (19:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+/Courier-Oblique 10 10 SUF
+48 300 M
+(#include <semaphore.h>) s
+/F-gs-font 10 10 SF
+24 289 M (20:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+/Courier-Oblique 10 10 SUF
+48 289 M
+(#include <unistd.h>) s
+/F-gs-font 10 10 SF
+24 278 M (21:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+24 267 M (22:) s
+48 267 M
+(int jobsSent = 0;           /* These variables are allocated globally because  */) s
+24 256 M (23:) s
+48 256 M
+(int jobsReceived = 0;       /* values cannot be passed to an interrupt handler */) s
+24 245 M (24:) s
+24 234 M (25:) s
+48 234 M
+(type) s
+/Courier-Bold 10 10 SUF
+72 234 M
+(def) s
+/F-gs-font 10 10 SF
+90 234 M
+( ) s
+/Courier-Bold 10 10 SUF
+96 234 M
+(struct Matrix {) s
+/F-gs-font 10 10 SF
+24 223 M (26:) s
+/Courier-Bold 10 10 SUF
+/F-gs-font 10 10 SF
+48 223 M
+(    int rows;) s
+24 212 M (27:) s
+48 212 M
+(    int columns;) s
+24 201 M (28:) s
+48 201 M
+(    int** mx;) s
+24 190 M (29:) s
+48 190 M
+(} M;) s
+24 179 M (30:) s
+24 168 M (31:) s
+48 168 M
+(/* Type ) s
+/Courier-Bold 10 10 SUF
+96 168 M
+(for) s
+/F-gs-font 10 10 SF
+114 168 M
+( messages going on the queue */) s
+24 157 M (32:) s
+48 157 M
+(type) s
+/Courier-Bold 10 10 SUF
+72 157 M
+(def) s
+/F-gs-font 10 10 SF
+90 157 M
+( ) s
+/Courier-Bold 10 10 SUF
+96 157 M
+(struct QueueMessage{) s
+/F-gs-font 10 10 SF
+24 146 M (33:) s
+/Courier-Bold 10 10 SUF
+/F-gs-font 10 10 SF
+48 146 M
+(    long type;) s
+24 135 M (34:) s
+48 135 M
+(    int jobid;) s
+24 124 M (35:) s
+48 124 M
+(    int rowvec;) s
+24 113 M (36:) s
+48 113 M
+(    int colvec;) s
+24 102 M (37:) s
+48 102 M
+(    int innerDim;) s
+24 91 M (38:) s
+48 91 M
+(    int data[100];) s
+24 80 M (39:) s
+48 80 M
+(} Msg;) s
+24 69 M (40:) s
+24 58 M (41:) s
+48 58 M
+(/* Struct ) s
+/Courier-Bold 10 10 SUF
+108 58 M
+(for) s
+/F-gs-font 10 10 SF
+126 58 M
+( argument to ) s
+/Courier-Bold 10 10 SUF
+204 58 M
+(pass) s
+/F-gs-font 10 10 SF
+228 58 M
+( to threads */) s
+24 47 M (42:) s
+48 47 M
+(struct myArg {) s
+24 36 M (43:) s
+48 36 M
+(    Msg *mssg;) s
+24 25 M (44:) s
+48 25 M
+(    pthread_mutex_t lock;) s
+24 14 M (45:) s
+48 14 M
+(    size_t size;) s
+24 3 M (46:) s
+48 3 M
+(};) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 2 def
+/fname (package.c) def
+/fdir (.) def
+/ftail (package.c) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (11/17/19) def
+/modtimestr (23:54:43) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+24 498 M (47:) s
+24 487 M (48:) s
+48 487 M
+(/* Function signatures */) s
+24 476 M (49:) s
+48 476 M
+(int** getMatrix\(char*, int* , int*\);) s
+24 465 M (50:) s
+48 465 M
+(void printMatrix\(M\);) s
+24 454 M (51:) s
+48 454 M
+(void freeMatrix\(M\);) s
+24 443 M (52:) s
+48 443 M
+(void printToFile\(M\);) s
+24 432 M (53:) s
+24 421 M (54:) s
+48 421 M
+(/* SIGINT handler to display jobs sent ) s
+/Courier-Bold 10 10 SUF
+282 421 M
+(and) s
+/F-gs-font 10 10 SF
+300 421 M
+( recieved */) s
+24 410 M (55:) s
+48 410 M
+(void sigintHandler\(int sig_num\) {) s
+24 399 M (56:) s
+48 399 M
+(    signal\(SIGINT, sigintHandler\);) s
+24 388 M (57:) s
+48 388 M
+(    printf\() s
+/Courier-Bold 10 10 SUF
+114 388 M
+("Jobs Sent %d Jobs Recieved %d\\n") s
+/F-gs-font 10 10 SF
+312 388 M
+(, jobsSent, jobsReceived\);) s
+24 377 M (58:) s
+48 377 M
+(    fflush\(stdout\);) s
+24 366 M (59:) s
+48 366 M
+(}) s
+24 355 M (60:) s
+24 344 M (61:) s
+48 344 M
+(/* Thread funciton which takes a message ) s
+/Courier-Bold 10 10 SUF
+294 344 M
+(and) s
+/F-gs-font 10 10 SF
+312 344 M
+( sends it to the ipc message queue. */) s
+24 333 M (62:) s
+48 333 M
+(/* It then waits until a ) s
+/Courier-Bold 10 10 SUF
+198 333 M
+(return) s
+/F-gs-font 10 10 SF
+234 333 M
+( value has been sent ) s
+/Courier-Bold 10 10 SUF
+360 333 M
+(and) s
+/F-gs-font 10 10 SF
+378 333 M
+( recieves it as well */) s
+24 322 M (63:) s
+48 322 M
+(void* package\(void *arg\) {) s
+24 311 M (64:) s
+48 311 M
+(    key_t key = ftok\() s
+/Courier-Bold 10 10 SUF
+174 311 M
+("mcdavis17") s
+/F-gs-font 10 10 SF
+240 311 M
+(, 1\);           /* connecting to the message queue */) s
+24 300 M (65:) s
+48 300 M
+(    int msgid = msgget\(key, 0666 | IPC_CREAT\);) s
+24 289 M (66:) s
+48 289 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 289 M
+(if) s
+/F-gs-font 10 10 SF
+84 289 M
+( \(msgid == -1\) {) s
+24 278 M (67:) s
+48 278 M
+(        printf\() s
+/Courier-Bold 10 10 SUF
+138 278 M
+("could not create msgid\\n") s
+/F-gs-font 10 10 SF
+294 278 M
+(\);) s
+24 267 M (68:) s
+48 267 M
+(    }) s
+24 256 M (69:) s
+24 245 M (70:) s
+48 245 M
+(    struct myArg *argument = \(struct myArg *\) arg;) s
+24 234 M (71:) s
+48 234 M
+(    pthread_mutex_lock\(&argument->lock\);         /* locking the lock */) s
+24 223 M (72:) s
+48 223 M
+(    Msg *msg = argument->mssg;) s
+24 212 M (73:) s
+48 212 M
+(    Msg messageSend = *msg;) s
+24 201 M (74:) s
+24 190 M (75:) s
+48 190 M
+(    /* Sending the message to the queue ) s
+/Courier-Bold 10 10 SUF
+288 190 M
+(and) s
+/F-gs-font 10 10 SF
+306 190 M
+( checking that it succeeds */) s
+24 179 M (76:) s
+48 179 M
+(    int rc = msgsnd\(msgid, &messageSend, \(messageSend.innerDim*2 + 5\) * sizeof\(int\), 1\); /* Send data of double the size of) s
+24 168 M (77:) s
+48 168 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 168 M
+(assert) s
+/F-gs-font 10 10 SF
+108 168 M
+(\(rc==0\);) s
+24 157 M (78:) s
+48 157 M
+(    printf\() s
+/Courier-Bold 10 10 SUF
+114 157 M
+("Sending job id %d type %ld size %zu \(rc=%d\)\\n") s
+/F-gs-font 10 10 SF
+396 157 M
+(, messageSend.jobid, messageSend.type, \(messageSend.innerDim*2+4\)) s
+24 146 M (79:) s
+48 146 M
+(    jobsSent++;) s
+24 135 M (80:) s
+24 124 M (81:) s
+48 124 M
+(    /* Returning a computed value ) s
+/Courier-Bold 10 10 SUF
+252 124 M
+(from) s
+/F-gs-font 10 10 SF
+276 124 M
+( the message queue */) s
+24 113 M (82:) s
+48 113 M
+(    Msg messageReturn;) s
+24 102 M (83:) s
+48 102 M
+(    msgrcv\(msgid, &messageReturn, 5 * sizeof\(int\), 2, 0\);) s
+24 91 M (84:) s
+48 91 M
+(    msg = &messageReturn;) s
+24 80 M (85:) s
+48 80 M
+(    printf\() s
+/Courier-Bold 10 10 SUF
+114 80 M
+("Recieving job id %d type %ld size %zu\\n") s
+/F-gs-font 10 10 SF
+360 80 M
+(, messageReturn.jobid, messageReturn.type, \(messageReturn.innerDim+1\) *) s
+24 69 M (86:) s
+48 69 M
+(    jobsReceived++;) s
+24 58 M (87:) s
+48 58 M
+(    pthread_mutex_unlock\(&argument->lock\);      /* unlocking the lock */) s
+24 47 M (88:) s
+48 47 M
+(    ) s
+24 36 M (89:) s
+48 36 M
+(    /* Returning the value to the output matrix */) s
+24 25 M (90:) s
+48 25 M
+(    void *p = msg;) s
+24 14 M (91:) s
+48 14 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 14 M
+(return) s
+/F-gs-font 10 10 SF
+108 14 M
+( p;) s
+24 3 M (92:) s
+48 3 M
+(}) s
+_R
+S
+%%Page: (3) 3
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 3 def
+/fname (package.c) def
+/fdir (.) def
+/ftail (package.c) def
+% User defined strings:
+/pagenumstr (3) def
+/moddatestr (11/17/19) def
+/modtimestr (23:54:43) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+24 498 M (93:) s
+24 487 M (94:) s
+48 487 M
+(int main\(int argc, char* argv[]\) {) s
+24 476 M (95:) s
+48 476 M
+(    pthread_mutex_t mutex;) s
+24 465 M (96:) s
+48 465 M
+(    int i, j, k;) s
+24 454 M (97:) s
+48 454 M
+(    int seconds = atoi\(argv[3]\);) s
+24 443 M (98:) s
+48 443 M
+(    signal\(SIGINT, sigintHandler\);) s
+24 432 M (99:) s
+48 432 M
+(    pthread_t *threads;) s
+18 421 M (100:) s
+48 421 M
+(    int rc = pthread_mutex_init\(&mutex, NULL\);) s
+18 410 M (101:) s
+48 410 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 410 M
+(assert) s
+/F-gs-font 10 10 SF
+108 410 M
+(\(rc == 0\);) s
+18 399 M (102:) s
+48 399 M
+(    ) s
+18 388 M (103:) s
+48 388 M
+(    /* Getting the matrices ) s
+/Courier-Bold 10 10 SUF
+216 388 M
+(from) s
+/F-gs-font 10 10 SF
+240 388 M
+( the file */) s
+18 377 M (104:) s
+48 377 M
+(    M matrix1;) s
+18 366 M (105:) s
+48 366 M
+(    M matrix2;) s
+18 355 M (106:) s
+48 355 M
+(    matrix1.rows = matrix1.columns = matrix2.rows = matrix2.columns = 0;) s
+18 344 M (107:) s
+48 344 M
+(    matrix1.mx = getMatrix\(argv[1], &matrix1.rows, &matrix1.columns\);) s
+18 333 M (108:) s
+48 333 M
+(    matrix2.mx = getMatrix\(argv[2], &matrix2.rows, &matrix2.columns\);) s
+18 322 M (109:) s
+48 322 M
+(    printMatrix\(matrix1\);) s
+18 311 M (110:) s
+48 311 M
+(    printMatrix\(matrix2\);) s
+18 300 M (111:) s
+18 289 M (112:) s
+48 289 M
+(    /* Allocating space ) s
+/Courier-Bold 10 10 SUF
+192 289 M
+(for) s
+/F-gs-font 10 10 SF
+210 289 M
+( each thread */) s
+18 278 M (113:) s
+48 278 M
+(    threads = malloc\( \(matrix1.rows*matrix2.columns\) * sizeof\(pthread_t\)\);) s
+18 267 M (114:) s
+48 267 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 267 M
+(if) s
+/F-gs-font 10 10 SF
+84 267 M
+( \(matrix1.columns != matrix2.rows\) { printf\() s
+/Courier-Bold 10 10 SUF
+348 267 M
+("Error: incompatible matrices\\n") s
+/F-gs-font 10 10 SF
+540 267 M
+(\); ) s
+/Courier-Bold 10 10 SUF
+558 267 M
+(return) s
+/F-gs-font 10 10 SF
+594 267 M
+( -1; }) s
+18 256 M (115:) s
+48 256 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 256 M
+(if) s
+/F-gs-font 10 10 SF
+84 256 M
+( \(threads == NULL\) {) s
+18 245 M (116:) s
+48 245 M
+(        printf\() s
+/Courier-Bold 10 10 SUF
+138 245 M
+("Error, not allocated\\n") s
+/F-gs-font 10 10 SF
+282 245 M
+(\);) s
+18 234 M (117:) s
+48 234 M
+(        ) s
+/Courier-Bold 10 10 SUF
+96 234 M
+(return) s
+/F-gs-font 10 10 SF
+132 234 M
+( -1;) s
+18 223 M (118:) s
+48 223 M
+(    }) s
+18 212 M (119:) s
+18 201 M (120:) s
+48 201 M
+(    /* Iterating through each row ) s
+/Courier-Bold 10 10 SUF
+252 201 M
+(and) s
+/F-gs-font 10 10 SF
+270 201 M
+( column of the matrix, initializing the message with data, ) s
+/Courier-Bold 10 10 SUF
+624 201 M
+(and) s
+/F-gs-font 10 10 SF
+642 201 M
+( creating) s
+18 190 M (121:) s
+48 190 M
+(        a thread which will send ) s
+/Courier-Bold 10 10 SUF
+246 190 M
+(and) s
+/F-gs-font 10 10 SF
+264 190 M
+( ) s
+/Courier-Bold 10 10 SUF
+270 190 M
+(return) s
+/F-gs-font 10 10 SF
+306 190 M
+( the dot product of each  */) s
+18 179 M (122:) s
+48 179 M
+(    int count = 0;) s
+18 168 M (123:) s
+48 168 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 168 M
+(for) s
+/F-gs-font 10 10 SF
+90 168 M
+( \(i = 0; i < matrix1.rows; i++\) {) s
+18 157 M (124:) s
+48 157 M
+(        ) s
+/Courier-Bold 10 10 SUF
+96 157 M
+(for) s
+/F-gs-font 10 10 SF
+114 157 M
+( \(j = 0; j < matrix2.columns; j++\) {) s
+18 146 M (125:) s
+48 146 M
+(            Msg *message = malloc\(sizeof\(Msg\)\);) s
+18 135 M (126:) s
+48 135 M
+(            message->type = 1;) s
+18 124 M (127:) s
+48 124 M
+(            message->jobid = count;) s
+18 113 M (128:) s
+48 113 M
+(            message->rowvec = i;) s
+18 102 M (129:) s
+48 102 M
+(            message->colvec = j;) s
+18 91 M (130:) s
+48 91 M
+(            message->innerDim = matrix1.columns;) s
+18 80 M (131:) s
+18 69 M (132:) s
+48 69 M
+(            struct myArg *arg = malloc\(sizeof\(struct myArg\)\);) s
+18 58 M (133:) s
+48 58 M
+(            arg->mssg = message;) s
+18 47 M (134:) s
+48 47 M
+(            arg->lock = mutex;) s
+18 36 M (135:) s
+18 25 M (136:) s
+48 25 M
+(            ) s
+/Courier-Bold 10 10 SUF
+120 25 M
+(for) s
+/F-gs-font 10 10 SF
+138 25 M
+( \(k = 0; k < matrix1.columns; k++\) {) s
+18 14 M (137:) s
+48 14 M
+(               message->data[k] = matrix1.mx[i][k];) s
+18 3 M (138:) s
+48 3 M
+(               message->data[message->innerDim+k] = matrix2.mx[k][j];) s
+_R
+S
+%%Page: (4) 4
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 4 def
+/fname (package.c) def
+/fdir (.) def
+/ftail (package.c) def
+% User defined strings:
+/pagenumstr (4) def
+/moddatestr (11/17/19) def
+/modtimestr (23:54:43) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+18 498 M (139:) s
+48 498 M
+(           }) s
+18 487 M (140:) s
+48 487 M
+(            int err = pthread_create\(&\(threads[count++]\), NULL, package, \(void*\) arg\);) s
+18 476 M (141:) s
+48 476 M
+(            ) s
+/Courier-Bold 10 10 SUF
+120 476 M
+(if) s
+/F-gs-font 10 10 SF
+132 476 M
+( \(err != 0\) {) s
+18 465 M (142:) s
+48 465 M
+(                printf\() s
+/Courier-Bold 10 10 SUF
+186 465 M
+("Error, thread number \\"%d\\" did not create, returned this %d\\n") s
+/F-gs-font 10 10 SF
+570 465 M
+(, count, err\);) s
+18 454 M (143:) s
+48 454 M
+(                ) s
+/Courier-Bold 10 10 SUF
+144 454 M
+(return) s
+/F-gs-font 10 10 SF
+180 454 M
+( -1;) s
+18 443 M (144:) s
+48 443 M
+(            }) s
+18 432 M (145:) s
+48 432 M
+(            sleep\(seconds\); /* sleeping ) s
+/Courier-Bold 10 10 SUF
+288 432 M
+(for) s
+/F-gs-font 10 10 SF
+306 432 M
+( the desired number of seconds */) s
+18 421 M (146:) s
+48 421 M
+(        }) s
+18 410 M (147:) s
+48 410 M
+(    }) s
+18 399 M (148:) s
+18 388 M (149:) s
+48 388 M
+(    /* Returning results ) s
+/Courier-Bold 10 10 SUF
+198 388 M
+(from) s
+/F-gs-font 10 10 SF
+222 388 M
+( threads to the main function */) s
+18 377 M (150:) s
+48 377 M
+(    M result;) s
+18 366 M (151:) s
+48 366 M
+(    result.rows = matrix1.rows;) s
+18 355 M (152:) s
+48 355 M
+(    result.columns = matrix2.columns;) s
+18 344 M (153:) s
+48 344 M
+(    void *p = malloc\(sizeof\(Msg\)\);) s
+18 333 M (154:) s
+48 333 M
+(    result.mx = malloc\( \(result.rows\) * sizeof\(int*\)\);) s
+18 322 M (155:) s
+48 322 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 322 M
+(for) s
+/F-gs-font 10 10 SF
+90 322 M
+( \(i = 0; i < result.rows; i++\) {) s
+18 311 M (156:) s
+48 311 M
+(        result.mx[i] = malloc \(result.columns * sizeof\(int\)\);) s
+18 300 M (157:) s
+48 300 M
+(    }) s
+18 289 M (158:) s
+48 289 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 289 M
+(for) s
+/F-gs-font 10 10 SF
+90 289 M
+( \(i = 0; i < result.rows*result.columns; i++\) {) s
+18 278 M (159:) s
+48 278 M
+(        ) s
+/Courier-Bold 10 10 SUF
+96 278 M
+(if) s
+/F-gs-font 10 10 SF
+108 278 M
+( \(pthread_join\(threads[i], &p\) != 0\) {) s
+18 267 M (160:) s
+48 267 M
+(            printf\() s
+/Courier-Bold 10 10 SUF
+162 267 M
+("Thread %d was not joined") s
+/F-gs-font 10 10 SF
+318 267 M
+(, i\);) s
+18 256 M (161:) s
+48 256 M
+(        }) s
+18 245 M (162:) s
+48 245 M
+(        Msg *msg = malloc\(sizeof\(Msg\)\);) s
+18 234 M (163:) s
+48 234 M
+(        msg = \(Msg*\)p;) s
+18 223 M (164:) s
+48 223 M
+(        Msg message = *msg;) s
+18 212 M (165:) s
+18 201 M (166:) s
+48 201 M
+(        result.mx[message.rowvec][message.colvec] = message.data[0];) s
+18 190 M (167:) s
+48 190 M
+(    }) s
+18 179 M (168:) s
+18 168 M (169:) s
+48 168 M
+(    printMatrix\(result\);) s
+18 157 M (170:) s
+48 157 M
+(    printToFile\(result\);) s
+18 146 M (171:) s
+48 146 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 146 M
+(return) s
+/F-gs-font 10 10 SF
+108 146 M
+( 0;) s
+18 135 M (172:) s
+48 135 M
+(}) s
+18 124 M (173:) s
+18 113 M (174:) s
+48 113 M
+(//    FUNCTION TO GET A MATRIX FROM A FILE) s
+18 102 M (175:) s
+48 102 M
+(int** getMatrix\(char* file, int *rows, int *columns\) {) s
+18 91 M (176:) s
+48 91 M
+(    int i, j, k;) s
+18 80 M (177:) s
+48 80 M
+(    FILE* matrixFile = fopen\(file, ) s
+/Courier-Bold 10 10 SUF
+258 80 M
+("r") s
+/F-gs-font 10 10 SF
+276 80 M
+(\);) s
+18 69 M (178:) s
+48 69 M
+(    char *c = malloc\(sizeof\(char*\)\);) s
+18 58 M (179:) s
+48 58 M
+(    int element;) s
+18 47 M (180:) s
+48 47 M
+(    ) s
+18 36 M (181:) s
+48 36 M
+(    //GETTING THE NUMBER OF ROWS AND COLUMNS IN THE MATRIX) s
+18 25 M (182:) s
+48 25 M
+(    fscanf\(matrixFile, ) s
+/Courier-Bold 10 10 SUF
+186 25 M
+("%s") s
+/F-gs-font 10 10 SF
+210 25 M
+(, c\);) s
+18 14 M (183:) s
+48 14 M
+(    *rows = atoi\(c\);) s
+18 3 M (184:) s
+48 3 M
+(    fscanf\(matrixFile, ) s
+/Courier-Bold 10 10 SUF
+186 3 M
+("%s") s
+/F-gs-font 10 10 SF
+210 3 M
+(, c\);) s
+_R
+S
+%%Page: (5) 5
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 5 def
+/fname (package.c) def
+/fdir (.) def
+/ftail (package.c) def
+% User defined strings:
+/pagenumstr (5) def
+/moddatestr (11/17/19) def
+/modtimestr (23:54:43) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+18 498 M (185:) s
+48 498 M
+(    *columns = atoi\(c\);) s
+18 487 M (186:) s
+48 487 M
+(    ) s
+18 476 M (187:) s
+48 476 M
+(    //DYNAMICALLY ALLOCATING DATA FOR THE MATRIX SO IT IS ON THE HEAP) s
+18 465 M (188:) s
+48 465 M
+(    int **matrix = malloc\(*rows * sizeof\(int *\)\);) s
+18 454 M (189:) s
+48 454 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 454 M
+(for) s
+/F-gs-font 10 10 SF
+90 454 M
+(\(i = 0; i < *rows; i++\)) s
+18 443 M (190:) s
+48 443 M
+(        matrix[i] = malloc\(*columns * sizeof\(int\)\);) s
+18 432 M (191:) s
+48 432 M
+(    ) s
+18 421 M (192:) s
+48 421 M
+(    //FILLING THE MATRIX WITH VALUES FROM THE FILE) s
+18 410 M (193:) s
+48 410 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 410 M
+(for) s
+/F-gs-font 10 10 SF
+90 410 M
+( \(j = 0; j < *rows; j++\) {) s
+18 399 M (194:) s
+48 399 M
+(        ) s
+/Courier-Bold 10 10 SUF
+96 399 M
+(for) s
+/F-gs-font 10 10 SF
+114 399 M
+( \(k = 0; k < *columns; k++\) {) s
+18 388 M (195:) s
+48 388 M
+(            fscanf\(matrixFile, ) s
+/Courier-Bold 10 10 SUF
+234 388 M
+("%s") s
+/F-gs-font 10 10 SF
+258 388 M
+(, c\);) s
+18 377 M (196:) s
+48 377 M
+(            element = atoi\(c\);) s
+18 366 M (197:) s
+48 366 M
+(            matrix[j][k] = element;) s
+18 355 M (198:) s
+48 355 M
+(        }) s
+18 344 M (199:) s
+48 344 M
+(    }) s
+18 333 M (200:) s
+48 333 M
+(    free\(c\);) s
+18 322 M (201:) s
+48 322 M
+(    fclose\(matrixFile\);) s
+18 311 M (202:) s
+48 311 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 311 M
+(return) s
+/F-gs-font 10 10 SF
+108 311 M
+( matrix;) s
+18 300 M (203:) s
+48 300 M
+(}) s
+18 289 M (204:) s
+18 278 M (205:) s
+48 278 M
+(void printToFile\(M matrix\) {) s
+18 267 M (206:) s
+48 267 M
+(    int j, k;) s
+18 256 M (207:) s
+48 256 M
+(    FILE* file = fopen\() s
+/Courier-Bold 10 10 SUF
+186 256 M
+("m_output.dat") s
+/F-gs-font 10 10 SF
+270 256 M
+(, ) s
+/Courier-Bold 10 10 SUF
+282 256 M
+("w") s
+/F-gs-font 10 10 SF
+300 256 M
+(\);) s
+18 245 M (208:) s
+18 234 M (209:) s
+48 234 M
+(    //fprintf\(file, ) s
+/Courier-Bold 10 10 SUF
+168 234 M
+("%d %d\\n") s
+/F-gs-font 10 10 SF
+222 234 M
+(, matrix.rows, matrix.columns\);) s
+18 223 M (210:) s
+48 223 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 223 M
+(for) s
+/F-gs-font 10 10 SF
+90 223 M
+( \(j = 0; j < matrix.rows; j++\) {) s
+18 212 M (211:) s
+48 212 M
+(        ) s
+/Courier-Bold 10 10 SUF
+96 212 M
+(for) s
+/F-gs-font 10 10 SF
+114 212 M
+( \(k = 0; k < matrix.columns; k++\) {) s
+18 201 M (212:) s
+48 201 M
+(            fprintf\(file, ) s
+/Courier-Bold 10 10 SUF
+204 201 M
+("%d ") s
+/F-gs-font 10 10 SF
+234 201 M
+(, matrix.mx[j][k]\);) s
+18 190 M (213:) s
+48 190 M
+(        }) s
+18 179 M (214:) s
+48 179 M
+(        printf\() s
+/Courier-Bold 10 10 SUF
+138 179 M
+("\\n") s
+/F-gs-font 10 10 SF
+162 179 M
+(\);) s
+18 168 M (215:) s
+48 168 M
+(    }) s
+18 157 M (216:) s
+48 157 M
+(}) s
+18 146 M (217:) s
+18 135 M (218:) s
+48 135 M
+(/* Prints a matrix to the console */) s
+18 124 M (219:) s
+48 124 M
+(void printMatrix\(M matrix\) {) s
+18 113 M (220:) s
+48 113 M
+(    int j, k;) s
+18 102 M (221:) s
+48 102 M
+(    //PRINTING THE MATRIX) s
+18 91 M (222:) s
+48 91 M
+(    printf\() s
+/Courier-Bold 10 10 SUF
+114 91 M
+("%d %d\\n") s
+/F-gs-font 10 10 SF
+168 91 M
+(, matrix.rows, matrix.columns\);) s
+18 80 M (223:) s
+48 80 M
+(    ) s
+/Courier-Bold 10 10 SUF
+72 80 M
+(for) s
+/F-gs-font 10 10 SF
+90 80 M
+( \(j = 0; j < matrix.rows; j++\) {) s
+18 69 M (224:) s
+48 69 M
+(        ) s
+/Courier-Bold 10 10 SUF
+96 69 M
+(for) s
+/F-gs-font 10 10 SF
+114 69 M
+( \(k = 0; k < matrix.columns; k++\) {) s
+18 58 M (225:) s
+48 58 M
+(            printf\() s
+/Courier-Bold 10 10 SUF
+162 58 M
+("%d ") s
+/F-gs-font 10 10 SF
+192 58 M
+(, matrix.mx[j][k]\);) s
+18 47 M (226:) s
+48 47 M
+(        }) s
+18 36 M (227:) s
+48 36 M
+(    }) s
+18 25 M (228:) s
+48 25 M
+(}) s
+_R
+S
+%%Trailer
+%%Pages: 5
+%%DocumentNeededResources: font Times-Roman Courier-Oblique Courier-Bold 
+%%+ font Courier Times-Bold 
+%%EOF
